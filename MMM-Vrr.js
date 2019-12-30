@@ -229,31 +229,55 @@ Module.register("MMM-Vrr", {
         let self = this;
         for (let trCounter = 0; trCounter < self.config.numberOfResults; trCounter++) {
 
-            let obj = usableResults[trCounter];
+			if (typeof usableResults[trCounter] == 'undefined'){
+				break;
+			}
+
+			let obj = usableResults[trCounter];
+			
 
             let trWrapper = document.createElement("tr");
             trWrapper.className = 'tr';
 
             if (self.config.displayIcons) {
-                let icon = self.createMatchingIcon(obj.type);
-                trWrapper.appendChild(icon);
+				
+				if (typeof obj.type == "undefined") {		
+					let icon = self.createMatchingIcon('bus');
+					trWrapper.appendChild(icon);				
+				}
+				else{
+					let icon = self.createMatchingIcon(obj.type);
+					trWrapper.appendChild(icon);
+				}
+				
             }
-
-            let remainingTime = self.calculateRemainingMinutes(obj.sched_date, obj.sched_time);
-            let timeValue;
+			
+			let remainingTime;
+			let sched_time;
+			let timeValue;
+			
+			if (typeof obj.sched_date == "undefined") {
+				remainingTime = self.calculateRemainingMinutes(obj.date, obj.time);
+				sched_time = obj.time;
+			}
+			else{
+				remainingTime = self.calculateRemainingMinutes(obj.sched_date, obj.sched_time);
+				sched_time = obj.sched_time;
+			}
+			
             switch (self.config.displayTimeOption) {
                 case 'time+countdown':
-                    timeValue = obj.sched_time + " (" + remainingTime + ")";
+                    timeValue = sched_time + " (" + remainingTime + ")";
                     break;
                 case 'time':
-                    timeValue = obj.sched_time;
+                    timeValue = sched_time;
                     break;
                 default:
                     timeValue = remainingTime;
             }
 
             let adjustedLine = self.stripLongLineNames(obj);
-
+			
             let tdValues = [
                 adjustedLine,
                 obj.platform,
@@ -261,9 +285,40 @@ Module.register("MMM-Vrr", {
                 timeValue
             ];
 
+			if(this.config.backend.includes("hafas") == true){
+				
+				let platform;
+				if (obj.platform == null){
+					platform = '-';
+				}
+				else{
+					platform = obj.platform;
+				}
+				
+				tdValues = [
+					adjustedLine,
+					platform,
+					obj.route_end,
+					timeValue
+				];
+				
+			}
+
             if(this.delayExist(self.dataRequest)){
                 if(obj.delay > 0){
-                    let delay = ' +' + obj.delay;
+                    let delay
+					
+					if(this.config.backend.includes("hafas") == true){
+					
+					delay = ' +' + obj.raw_e_delay;
+				
+					}
+					else{
+						
+						delay = ' +' + obj.delay;
+						
+					}
+					
                     tdValues.push(delay);
                 }
             }
@@ -315,7 +370,14 @@ Module.register("MMM-Vrr", {
      * @returns {XML|void|string}
      */
     stripLongLineNames: function (routeData) {
-        return routeData.line.substr(0, 7);
+		
+		if(this.config.backend.includes("hafas") == true){
+			return routeData.train.substr(0, 7);
+		}else{
+			return routeData.line.substr(0, 7);
+		}
+		
+        
     },
 
     /**
@@ -355,6 +417,13 @@ Module.register("MMM-Vrr", {
                 symbolType = 'subway';
                 break;
             case 'InterCityExpress':
+			case 'ICE':
+			case 'InterCity':
+			case 'Regional-Express':
+			case 'R-Bahn':
+			case 'InterRegioExpress':
+			case 'Regionalbahn':
+			case 'ABELLIO Rail Baden-Württemberg GmbH':
                 symbolType = 'train';
                 break;
             case 'TaxiBus':
