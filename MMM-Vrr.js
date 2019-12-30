@@ -20,7 +20,8 @@ Module.register("MMM-Vrr", {
         setWidth: false,
         scrollAfter: false,
         lcdWith: 450,
-        line: ""
+        line: "",
+		backend: ""
     },
 
     requiresVersion: "2.1.0", // Required version of MagicMirror
@@ -44,11 +45,21 @@ Module.register("MMM-Vrr", {
         let url;
         if(lcd === true) {
             url = this.vrrLcd();
-	}
-	else {
+		}
+		else {
             url = this.vrrJson();
         }
         url += "&no_lines=" + this.config.numberOfResults + "&line=" + this.config.line + "";
+		
+		if(this.config.backend != ''){ // Check if another backend should be used
+            url += "&backend=" + this.config.backend
+			
+			if(this.config.backend.includes("hafas") == true){
+				url = url.replace(this.config.city + "/", ""); // Remove City from url for hafas backends (not necessary)
+			}
+			
+        }
+	
         return url;
     },
 
