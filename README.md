@@ -2,9 +2,7 @@
 
 This is a module for the [MagicMirror²](https://github.com/MichMich/MagicMirror/).
 
-Displays the next departure times of Trains, subway and Buses from any city and station in the german federal state North Rhine-Westphalia (VRR).
-
-This module was intended for VRR, but it also supports the [following](#efa) Areas.
+Displays the next departure times of Trains, subway and Buses from any city and station in the [below](#efa) mentioned areas (by transportation authorities). By default only in the VRR-Area (basically North Rhine-Westphalia) and some other stations in the DACH countries. See [Support for other Areas](#efa).
 
 
 ![displayType detail](mmm-vrr-table.png) &nbsp;&nbsp; ![displayType digital](mmm-vrr.png)
@@ -33,6 +31,27 @@ To use this module, add the following configuration block to the modules array i
     }
 }  
 ```
+
+## Using the module with differend backend
+
+If the desired station is not found with the VRR backend, use the secific backend of the area (see [List](#efa) below).
+The names of the stations differ depending on the backend, to find the right combination of city and station see https://vrrf.finalrewind.org/ (GUI of the used 3rd Party API).
+
+```
+{
+    module: 'MMM-Vrr',
+    position: "top_right",
+    config: {
+        //city: 'Bremen', // For HEFAS Backends not needed
+        station: 'Rembertistraße', // Station in Bremen (VBN Area)
+        backend: 'hafas.VBN', // Backend of the VBN (Verkehrsverbund Bremen/Niedersachsen)
+        numberOfResults: 10,
+        displayTimeOption: 'countdown',
+        displayType: 'lcd'
+    }
+}  
+```
+
 ## Configuration options
 
 | Option           | Description | Options |
@@ -48,6 +67,7 @@ To use this module, add the following configuration block to the modules array i
 | `lcdWidth` | *Optional* Sets the width of the lcd display type <br><br>**Type:** `int` (**default**: 450) | any possible size
 | `scrollAfter` | *Optional* Scrolls the destination text after the specified characters <br><br>**Type:** `int` (**default**: false) | any possible size or `false`
 | `line` | *Optional* Only show lines that start with the given string. Supports multiple strings, separated by comma (","). <br><br>**Type:** `string` (**default**: empty (i.e., show all lines)) | any possible string (e.g., "RB33,U")
+| `backend`        | *Optional* Set another Backend (default/emty = VRR). Makes the other areas fully supported, by select the specifc area-backend <br><br>**Type:** `String` (**default**: emty) | Any Backend in the [List](#efa) below.
 
 ## Supported Languages
 
@@ -65,42 +85,48 @@ If you set `scrollAfter:15`, the text will be scrolled horizontally if it has 15
 
 ![Auto scroll](scrollAfter.gif)
 
-## <a name="efa"></a> EFA Support for other Areas
+## <a name="efa"></a>Support for other Areas
 
-**Please keep in mind, that everything besides VRR is not full supported.**
-
+This module was intended for VRR, but it also supports the following Areas.
 Possible Side effects for not VRR Areas:
 * Icons don't match correctly
 * not all configured transport types hide correctly
 
-**Partly supported Areas:**
-* ASEAG
-* BSVG
-* DING
-* IVB
-* KVV
-* LinzAG
-* NVBW
-* SVV
-* TLEM
-* VBL
-* VGN
-* VMV
-* VOR
-* VRN
-* VVO
-* VVS
-* VVV
-* BVG
-* DB
-* NAHSH
-* NASA
-* NVV
-* RSAG
-* SBB
-* VBB
-* VBN
-* ÖBB
+**Areas and specific Backend:**
+* ASEAG `ura.ASEAG`
+* BSVG `efa.BSVG`
+* BVG `hafas.BVG`
+* DB `hafas.DB`
+* DING `efa.DING`
+* IVB `efa.IVB`
+* KVV `efa.KVV`
+* LinzAG `efa.LinzAG`
+* MM `ura.MM`
+* NAHSH `hafas.NAHSH`
+* NASA `hafas.NASA`
+* NVBW `efa.NVBW`
+* NVV `hafas.NVV`
+* ÖBB `hafas.ÖBB`
+* RSAG `hafas.RSAG`
+* SBB `hafas.SBB`
+* SVV `efa.SVV`
+* TfL `ura.TfL`
+* TLEM `efa.TLEM`
+* VBB `hafas.VBB`
+* VBL `efa.VBL`
+* VBN `hafas.VBN`
+* VGN `efa.VGN`
+* VMV `efa.VMV`
+* VOR `efa.VOR`
+* VRN `efa.VRN`
+* VRNdelfi `efa.VRNdelfi`
+* VRR `efa.VRR`
+* VRR2 `efa.VRR2`
+* VVO `efa.VVO`
+* VVS `efa.VVS`
+* VVV `efa.VVV`
+
+
 
 ## Feedback
 
